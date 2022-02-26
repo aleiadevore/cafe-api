@@ -91,6 +91,28 @@ class Users(Resource):
                 'message': f"'{args['userId']}' user not found."
             }, 404
 
+    def delete(self):
+        """ Deletes user """
+        parser = reqparse.RequestParser()  # initialize parser
+        parser.add_argument('userId', required=True)
+        args = parser.parse_args()
+
+        # read csv
+        data = pd.read_csv('data/users.csv')
+
+        if args['userId'] in list(data['userId']):
+            # If user found
+            user = data[data['userId'] == args['userId']]
+            # remove data entry matching userId
+            data = data[data['userId'] != args['userId']]
+            data.to_csv('data/users.csv', index=False)
+            return {'data': data.to_dict()}, 200
+        else:
+            # If user not found
+            return {
+                'message': f"'{args['userId']}' user not found."
+            }, 404
+
 
 class Locations(Resource):
     """ Handles methods to access locations """

@@ -8,13 +8,15 @@ import ast
 app = Flask(__name__)
 api = Api(app)
 
+
 class Users(Resource):
     """ Handles methods to access user info """
     def get(self):
-        """Get all users"""
+        """ Get all users """
         data = pd.read_csv('data/users.csv')
-        data = data.to_dict() # convert data to dictionary
-        return {'data': data}, 200 # return data and 200 OK code
+        data = data.to_dict()  # convert data to dictionary
+        return {'data': data}, 200  # return data and 200 OK code
+
 
 class Locations(Resource):
     """ Handles methods to access locations """
@@ -24,11 +26,13 @@ class Locations(Resource):
         data = data.to_dict()
         return {'data': data}, 200
 
+
 class Welcome(Resource):
     """ Home screen, used for testing """
     def get(self):
         """ Posts welcome message, used for testing """
         return 'Hey there', 200
+
 
 api.add_resource(Welcome, '/')
 api.add_resource(Users, '/users')

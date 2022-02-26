@@ -54,6 +54,43 @@ class Users(Resource):
         # Return new data set with 200 OK status
         return {'data': data.to_dict()}, 200
 
+    def put(self):
+        """ Adds a location to a user """
+        parser = reqparse.RequestParser()  # initialize parser
+
+        # Add arguments
+        parser.add_argument('userId', required=True)
+        parser.add_argument('location', required=True)
+        args = parser.parse_args()  # parse arguments to dict
+
+        # read csv
+        data = pd.read_csv('data/users.csv')
+
+        # Check if user exists
+        if args['userId'] in list(data['userId']):
+            # evaluate strings of lists to lists
+            data['locations'] = data['locations'].apply(
+                # ast.literal_eval safely evaluates strings
+                lambda x: ast.literal_eval(x)
+            )
+            # select user
+            user_data = data[data['userId'] == args['userId']]
+
+            # update user's locations
+            user_data['locations'] = user_data['locations'].values[0] \
+                .append(args['location'])
+
+            # save back to csv
+            data.to_csv('data/users.csv', index=False)
+
+            # return data and 200 OK
+            return {'data': data.to_dict()}, 200
+        else:
+            # If user doesn't exist
+            return {
+                'message': f"'{args['userId']}' user not found."
+            }, 404
+
 
 class Locations(Resource):
     """ Handles methods to access locations """

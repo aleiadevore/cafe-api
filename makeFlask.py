@@ -16,6 +16,7 @@ class Users(Resource):
         data = pd.read_csv('data/users.csv')
         data = data.to_dict()  # convert data to dictionary
         return {'data': data}, 200  # return data and 200 OK code
+
     def post(self):
         """ Creates new user """
         parser = reqparse.RequestParser()  # initialize parser
@@ -28,10 +29,11 @@ class Users(Resource):
         # Parse arguments into a dictionary
         args = parser.parse_args()
 
-        """Create pandas dataframe: 
-        a two-dimensional, size-mutable, potentially heterogeneous tabular data"""
+        """Create pandas dataframe:
+        a two-dimensional, size-mutable,
+        potentially heterogeneous tabular data"""
         new_data = pd. DataFrame({
-            'userID': args['userId'],
+            'userId': args['userId'],
             'name': args['name'],
             'city': args['city'],
             'locations': [[]]
@@ -39,12 +41,18 @@ class Users(Resource):
 
         # Read csv
         data = pd.read_csv('data/users.csv')
+        # Check if user already exists
+        if args['userId'] in list(data['userId']):
+            return {
+                'message': f"'{args['userId']}' already exists."
+            }, 401
         # Add new values
         data = data.append(new_data, ignore_index=True)
         # Save back to csv
         data.to_csv('data/users.csv', index=False)
 
-        return {'data': data.to_dict()}, 200  # Return new data set with 200 OK status
+        # Return new data set with 200 OK status
+        return {'data': data.to_dict()}, 200
 
 
 class Locations(Resource):
